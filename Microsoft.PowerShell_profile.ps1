@@ -11,7 +11,7 @@
 # | wanspeed       Internet Speed Test                       | wanlat      Get 1.1.1.1 Latency                                |
 # | testdns        DNS Latency Test                          | tail        Watch changes to a file live                       |
 # ┕——————————————————————————————————————————————————————————✼————————————————————————————————————————————————————————————————┙
-# To Add: tcping, waitrdp, waithttp, waitssl, Test-ValidIPAddress, Test-ValidMACAddress, Test-ValidEmail, Test-Port, countdown, 
+# To Add: tcping, waitrdp, waithttp, waitssl, Test-Port, countdown
 clear
 $Admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
 $ProfilePath = Split-Path -Path $profile.CurrentUserCurrentHost
