@@ -12,15 +12,18 @@
 # | testdns        DNS Latency Test                          | tail        Watch changes to a file live                       |
 # ┕——————————————————————————————————————————————————————————✼————————————————————————————————————————————————————————————————┙
 # To Add: tcping, waitrdp, waithttp, waitssl, Test-Port, countdown
+
 clear
 $Admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
 $ProfilePath = Split-Path -Path $profile.CurrentUserCurrentHost
+Unblock-File "$profilepath\nettests.ps1"
+Unblock-File "$profilepath\Get-WanSpeed.ps1"
+Unblock-File "$profilepath\logtime.ps1"
+Unblock-File "$profilepath\compinfo.ps1"
+Unblock-File "$profilepath\Invoke-TSPingSweep.ps1"
+. $profilepath\nettests.ps1
 
-
-Function testdns {
-	Write-Host "Testing DNS Latency"
-	& $profilepath\testdns.ps1	
-}
+Function testdns {Write-Host "Testing DNS Latency";	& $profilepath\testdns.ps1}
 
 Function 365 {
 	$UserCredential = Get-Credential
@@ -29,25 +32,13 @@ Function 365 {
 	Write-Host "Be sure to run [Remove-PSSession $Session] when done"
 }
 
-Function gwlat {
-	Import-Module "$profilepath\nettests.ps1"
-	gwlattest
-}
+Function gwlat {gwlattest}
 
-Function wanlat {
-	Import-Module "$profilepath\nettests.ps1"
-	wanlattest
-}
+Function wanlat {wanlattest}
 
-Function wanspeed {
-	Write-Host "Testing Internet Speed"
-	& $profilepath\Get-WanSpeed.ps1
-	
-}
+Function wanspeed {Write-Host "Testing Internet Speed";	& $profilepath\Get-WanSpeed.ps1}
 
-Function title($title) {
-	$host.ui.RawUI.WindowTitle = $title
-}
+Function title($title) {$host.ui.RawUI.WindowTitle = $title}
 
 function genpass {Add-Type -AssemblyName System.web;[System.Web.Security.Membership]::GeneratePassword(20,5) | Set-Clipboard;Write-Host "Copied to clipboard" -ForegroundColor Green}
 
@@ -71,15 +62,9 @@ Function HumanReadK($number){
 	Return [math]::round($number/1KB, 2)
 }
 
-Function ports {            
-	Import-Module "$profilepath\nettests.ps1"
-	portstest
-}
+Function ports {portstest}
 
-Function compinfo {
-	Write-Host "Getting Computer Info"
-	& $profilepath\compinfo.ps1	
-}
+Function compinfo {Write-Host "Getting Computer Info"; & $profilepath\compinfo.ps1}
 
 Function nscan{
 	Param(
@@ -99,10 +84,7 @@ Function home{ssh [your ssh server]}
 
 Function weather {clear;(curl http://wttr.in/[your city] -UserAgent "curl" ).Content}
 
-Function myip{
-	$IPAddress = (Invoke-WebRequest -uri "http://ifconfig.me/ip").Content
-	write-Host "`nYour Public IP is"$IPAddress -ForegroundColor Green
-}
+Function myip{$IPAddress = (Invoke-WebRequest -uri "http://ifconfig.me/ip").Content; write-Host "`nYour Public IP is"$IPAddress -ForegroundColor Green}
 
 Function last5 {
 	$logs = "system", "application"
@@ -118,13 +100,10 @@ Function watchop {
         [parameter(position=0)]
 		$ip
     )
-	Import-Module "$profilepath\nettests.ps1"
 	watchoptest $port $ip
 }
 
-Function watchlog($log) {
-	cls;get-date;Write-host "Watching $log Log";$idxA = (get-eventlog -LogName $log -Newest 1).Index;while($true){$idxA2 = (Get-EventLog -LogName $log -newest 1).index;get-eventlog -logname $log -newest ($idxA2 - $idxA) |  sort index;$idxA = $idxA2;sleep 10}
-}
+Function watchlog($log) {cls;get-date;Write-host "Watching $log Log";$idxA = (get-eventlog -LogName $log -Newest 1).Index;while($true){$idxA2 = (Get-EventLog -LogName $log -newest 1).index;get-eventlog -logname $log -newest ($idxA2 - $idxA) |  sort index;$idxA = $idxA2;sleep 10}}
 
 Function dirmore {
 	param( $gui = $null )
@@ -135,13 +114,9 @@ Function dirmore {
 	}
 }
 
-function nano ($File){
-    bash -c "nano $File"
-}
+function nano ($File){bash -c "nano $File"}
 
-function npp ($File) {
-	start notepad++ $File
-}
+function npp ($File) {start notepad++ $File}
 
 function tail($filename) {
     $last = ''
