@@ -1,17 +1,19 @@
-# ┍——————————————————————————————————————————————————————— TOOLS —————————————————————————————————————————————————————————————┑
-# | la             List Aliases                              | genpass     Generate Random Password                           |
-# | tt             Start Time Tracker                        | ports       List All Open Ports                                |
-# | title          Set Window Title                          | compinfo    Get Computer Information                           |
-# | nscan          Scan Network ([start] [end])              | home        SSH To Home                                        |
-# | weather        Get Weather Forcast                       | myip        Show public IP                                     |
-# | last5          Get Last 5 events from logs               | watchop     Watch a server ([ip] [port])                       |
-# | watchlog       Watch Event Log ([log])                   | dirmore     Dir With Folder Sizes (Add 'gui' for gui window)   |
-# | nano           Run Nano in Bash ([filename])             | npp         Open file in Notepad++                             |
-# | 365            Connect to Office 365                     | gwlat       Get Default Gateway Latency                        |
-# | wanspeed       Internet Speed Test                       | wanlat      Get 1.1.1.1 Latency                                |
-# | testdns        DNS Latency Test                          | tail        Watch changes to a file live                       |
-# ┕——————————————————————————————————————————————————————————✼————————————————————————————————————————————————————————————————┙
-# To Add: tcping, waitrdp, waithttp, waitssl, Test-Port, countdown
+# ┍——————————————————————————————————————————— TOOLS —————————————————————————————————————————————————┑
+# | la             List Aliases                  | genpass     Generate Random Password               |
+# | tt             Start Time Tracker            | ports       List All Open Ports                    |
+# | title          Set Window Title              | compinfo    Get Computer Information               |
+# | nscan          Scan Network ([start] [end])  | home        SSH To Home                            |
+# | weather        Get Weather Forcast           | myip        Show public IP                         |
+# | last5          Get Last 5 events from logs   | watchop     Watch a server ([ip] [port])           |
+# | watchlog       Watch Event Log ([log])       | dirmore     Dir With Folder Sizes (Can Add 'GUI')  |
+# | nano           Run Nano in Bash ([filename]) | npp         Open file in Notepad++                 |
+# | 365            Connect to Office 365         | gwlat       Get Default Gateway Latency            |
+# | wanspeed       Internet Speed Test           | wanlat      Get 1.1.1.1 Latency                    |
+# | testdns        DNS Latency Test              | tail        Watch changes to a file live           |
+# | tcping         Continually check server      | waitrdp     Alert when RDP is back online          |
+# | waithttp       Alert when HTTP back online   | waitssl     Alert when HTTPS is back online        |
+# | Test-Port      Show if port is up            | countdown   Start a countdown                      |
+# ┕——————————————————————————————————————————————✼————————————————————————————————————————————————————┙
 
 clear
 $Admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
@@ -22,6 +24,7 @@ Unblock-File "$profilepath\logtime.ps1"
 Unblock-File "$profilepath\compinfo.ps1"
 Unblock-File "$profilepath\Invoke-TSPingSweep.ps1"
 . $profilepath\nettests.ps1
+$Header = "~-~-~-~-~ Type 'la' for aliases. ~-~-~-~-~"
 
 Function testdns {Write-Host "Testing DNS Latency";	& $profilepath\testdns.ps1}
 
@@ -42,7 +45,7 @@ Function title($title) {$host.ui.RawUI.WindowTitle = $title}
 
 function genpass {Add-Type -AssemblyName System.web;[System.Web.Security.Membership]::GeneratePassword(20,5) | Set-Clipboard;Write-Host "Copied to clipboard" -ForegroundColor Green}
 
-function la {clear;(Select-String -Path $profile -Pattern '^#').Line.TrimStart(" ", "#");title("~-~-~-~-~ Type 'la' for aliases. ~-~-~-~-~")}
+function la {clear;(Select-String -Path $profile -Pattern '^#').Line.TrimStart(" ", "#");title($Header)}
 
 function tt {Start-Job -FilePath "$profilepath\logtime.ps1"}
 
@@ -130,5 +133,5 @@ function tail($filename) {
     }
 }
 
-Write-Host "~-~-~-~-~ Type 'la' for aliases. ~-~-~-~-~" -ForegroundColor Green
-title("~-~-~-~-~ Type 'la' for aliases. ~-~-~-~-~")
+Write-Host $Header -ForegroundColor Green
+title($Header)
