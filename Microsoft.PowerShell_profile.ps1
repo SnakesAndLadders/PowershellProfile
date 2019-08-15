@@ -18,15 +18,23 @@
 clear
 $Admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
 $ProfilePath = Split-Path -Path $profile.CurrentUserCurrentHost
-Unblock-File "$profilepath\nettests.ps1"
-Unblock-File "$profilepath\Get-WanSpeed.ps1"
-Unblock-File "$profilepath\logtime.ps1"
-Unblock-File "$profilepath\compinfo.ps1"
-Unblock-File "$profilepath\Invoke-TSPingSweep.ps1"
-. $profilepath\nettests.ps1
+$ScriptsPath = "$ProfilePath\Scripts"
+$SSHServer = 
+$SSHPort = 
+$City = "http://wttr.in/[city]"
+
+Unblock-File "$ScriptsPath\nettests.ps1"
+Unblock-File "$ScriptsPath\Get-WanSpeed.ps1"
+Unblock-File "$ScriptsPath\logtime.ps1"
+Unblock-File "$ScriptsPath\compinfo.ps1"
+Unblock-File "$ScriptsPath\Invoke-TSPingSweep.ps1"
+. $ScriptsPath\nettests.ps1
 $Header = "~-~-~-~-~ Type 'la' for aliases. ~-~-~-~-~"
 
-Function testdns {Write-Host "Testing DNS Latency";	& $profilepath\testdns.ps1}
+Function testdns {
+	Write-Host "Testing DNS Latency"
+	& $ScriptsPath\testdns.ps1	
+}
 
 Function 365 {
 	$UserCredential = Get-Credential
@@ -35,19 +43,31 @@ Function 365 {
 	Write-Host "Be sure to run [Remove-PSSession $Session] when done"
 }
 
-Function gwlat {gwlattest}
+Function gwlat {
+	Import-Module "$ScriptsPath\nettests.ps1"
+	gwlattest
+}
 
-Function wanlat {wanlattest}
+Function wanlat {
+	Import-Module "$ScriptsPath\nettests.ps1"
+	wanlattest
+}
 
-Function wanspeed {Write-Host "Testing Internet Speed";	& $profilepath\Get-WanSpeed.ps1}
+Function wanspeed {
+	Write-Host "Testing Internet Speed"
+	& $ScriptsPath\Get-WanSpeed.ps1
+	
+}
 
-Function title($title) {$host.ui.RawUI.WindowTitle = $title}
+Function title($title) {
+	$host.ui.RawUI.WindowTitle = $title
+}
 
 function genpass {Add-Type -AssemblyName System.web;[System.Web.Security.Membership]::GeneratePassword(20,5) | Set-Clipboard;Write-Host "Copied to clipboard" -ForegroundColor Green}
 
-function la {clear;(Select-String -Path $profile -Pattern '^#').Line.TrimStart(" ", "#");title($Header)}
+function la {clear;(Select-String -Path $profile -Pattern '^#').Line.TrimStart(" ", "#");title("~-~-~-~-~ Type 'la' for aliases. ~-~-~-~-~")}
 
-function tt {Start-Job -FilePath "$profilepath\logtime.ps1"}
+function tt {Start-Job -FilePath "$ScriptsPath\logtime.ps1"}
 
 Function NotifyNow($ToSend){
 	Add-Type -AssemblyName System.Windows.Forms 
@@ -65,9 +85,15 @@ Function HumanReadK($number){
 	Return [math]::round($number/1KB, 2)
 }
 
-Function ports {portstest}
+Function ports {            
+	Import-Module "$ScriptsPath\nettests.ps1"
+	portstest
+}
 
-Function compinfo {Write-Host "Getting Computer Info"; & $profilepath\compinfo.ps1}
+Function compinfo {
+	Write-Host "Getting Computer Info"
+	& $ScriptsPath\compinfo.ps1	
+}
 
 Function nscan{
 	Param(
@@ -77,17 +103,20 @@ Function nscan{
 		$start
     )
 	title "Scanning Network"
-	Import-Module "$profilepath\Invoke-TSPingSweep.ps1"
+	Import-Module "$ScriptsPath\Invoke-TSPingSweep.ps1"
 	Invoke-TSPingSweep -StartAddress $start -EndAddress $end -ResolveHost -ScanPort -TimeOut 500
 	title "Scan Complete"
 	NotifyNow("Scan Complete")
 }
 
-Function home{ssh [your ssh server]}
+Function home{ssh $SSHServer -p $SSHPort}
 
-Function weather {clear;(curl http://wttr.in/[your city] -UserAgent "curl" ).Content}
+Function weather {clear;(curl $City -UserAgent "curl" ).Content}
 
-Function myip{$IPAddress = (Invoke-WebRequest -uri "http://ifconfig.me/ip").Content; write-Host "`nYour Public IP is"$IPAddress -ForegroundColor Green}
+Function myip{
+	$IPAddress = (Invoke-WebRequest -uri "http://ifconfig.me/ip").Content
+	write-Host "`nYour Public IP is"$IPAddress -ForegroundColor Green
+}
 
 Function last5 {
 	$logs = "system", "application"
@@ -103,10 +132,13 @@ Function watchop {
         [parameter(position=0)]
 		$ip
     )
+	Import-Module "$profilepath\nettests.ps1"
 	watchoptest $port $ip
 }
 
-Function watchlog($log) {cls;get-date;Write-host "Watching $log Log";$idxA = (get-eventlog -LogName $log -Newest 1).Index;while($true){$idxA2 = (Get-EventLog -LogName $log -newest 1).index;get-eventlog -logname $log -newest ($idxA2 - $idxA) |  sort index;$idxA = $idxA2;sleep 10}}
+Function watchlog($log) {
+	cls;get-date;Write-host "Watching $log Log";$idxA = (get-eventlog -LogName $log -Newest 1).Index;while($true){$idxA2 = (Get-EventLog -LogName $log -newest 1).index;get-eventlog -logname $log -newest ($idxA2 - $idxA) |  sort index;$idxA = $idxA2;sleep 10}
+}
 
 Function dirmore {
 	param( $gui = $null )
@@ -117,9 +149,13 @@ Function dirmore {
 	}
 }
 
-function nano ($File){bash -c "nano $File"}
+function nano ($File){
+    bash -c "nano $File"
+}
 
-function npp ($File) {start notepad++ $File}
+function npp ($File) {
+    start notepad++ $File
+}
 
 function tail($filename) {
     $last = ''
@@ -132,6 +168,5 @@ function tail($filename) {
         Start-Sleep 1
     }
 }
-
 Write-Host $Header -ForegroundColor Green
 title($Header)
