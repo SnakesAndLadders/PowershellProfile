@@ -18,5 +18,4 @@ foreach ($dnsserver in $DNSServers){
 	$totalmeasurement = $totalmeasurement / $numberoftests
 	$totalmeasurement = [math]::Round(($totalmeasurement),4)
 	write-host "DNS Server:  $dnsserver, Response time: $totalmeasurement seconds"
-	
 }
